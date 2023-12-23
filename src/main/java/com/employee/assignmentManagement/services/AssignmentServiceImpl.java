@@ -11,9 +11,9 @@ import java.util.*;
 @Service
 public class AssignmentServiceImpl implements AssignmentService {
 
-    private AssignmentRepository repository;
-    private EmployeeService employeeService;
-    private ProjectService projectService;
+    private final AssignmentRepository repository;
+    private final EmployeeService employeeService;
+    private final ProjectService projectService;
 
     @Autowired
     public AssignmentServiceImpl(AssignmentRepository repository, EmployeeService employeeService, ProjectService projectService) {
@@ -72,7 +72,7 @@ public class AssignmentServiceImpl implements AssignmentService {
 
 
     @Override
-    public List<EmployeePairDTO> findLongestRunningPair(){
+    public List<EmployeePairDTO> findLongestRunningPairs(){
         return repository.findLongestRunningPairs();
     }
 
@@ -94,8 +94,10 @@ public class AssignmentServiceImpl implements AssignmentService {
             }
             teams.get(t).setTotalDuration(teams.get(t).getTotalDuration() + pair.getDuration());
         }
+
         Map.Entry<TeamDTO,TeamAssignmentDTO> longestRunning = Collections.max(teams.entrySet(),
                 Comparator.comparing((Map.Entry<TeamDTO, TeamAssignmentDTO> e) -> e.getValue().getTotalDuration()));
+
         StringBuilder sb = new StringBuilder();
         sb.append(longestRunning.getKey().toString()).append(',').append(longestRunning.getValue().getTotalDuration())
                 .append(System.lineSeparator());

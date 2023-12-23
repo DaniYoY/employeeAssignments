@@ -29,7 +29,7 @@ public class CSVAssignmentParser {
         LocalDate startDate = LocalDate.parse(values[THIRD_ELEMENT].strip(), DateTimeFormatter.ofPattern(dateFormat));
         LocalDate endDate = null;
         if (!values[FORTH_ELEMENT].strip().equalsIgnoreCase(NULL)) {
-            endDate = LocalDate.parse(values[FORTH_ELEMENT], DateTimeFormatter.ofPattern(dateFormat));
+            endDate = LocalDate.parse(values[FORTH_ELEMENT].strip(), DateTimeFormatter.ofPattern(dateFormat));
         }
         return new AssignmentDTO(employeeID, projectID, startDate, endDate);
     }

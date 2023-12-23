@@ -20,7 +20,7 @@ public interface AssignmentService {
 
     List<Assignment> create(List<Assignment> assignments);
 
-    List<EmployeePairDTO> findLongestRunningPair();
+    List<EmployeePairDTO> findLongestRunningPairs();
 
     String findLongestRunningTeam();
 

@@ -7,6 +7,8 @@ import com.employee.assignmentManagement.models.*;
 import com.employee.assignmentManagement.services.AssignmentService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,23 +24,39 @@ import java.util.List;
 public class AssignmentReSTController {
 
     @Autowired
-    private AssignmentService assignmentService;
+    private final AssignmentService assignmentService;
 
     @Autowired
-    private AssignmentDTOInputReader reader;
+    private final AssignmentDTOInputReader reader;
 
     public AssignmentReSTController(AssignmentService assignmentService, AssignmentDTOInputReader reader) {
         this.assignmentService = assignmentService;
         this.reader = reader;
     }
 
-    @PostMapping("/upload")
-    ResponseEntity<String> uploadAssignmentsFromFile(@RequestParam("file") MultipartFile multipartFile,
-                                             @RequestBody AssignmentFileUploadDTO dto) throws IOException {
+//    TODO consumes = {"multipart/form-data"}
+    @PostMapping(value = "/upload")
+    ResponseEntity<String> uploadAssignmentsFromFile(@RequestParam("file") @Valid @NotNull MultipartFile multipartFile,
+                                             @RequestParam("areHeaders") @Valid @NotBlank String areHeadersStr,
+                                             @RequestParam("dateFormat") @NotNull String dateFormat) throws IOException {
         try {
+            boolean areHeaders;
+            if (areHeadersStr.equalsIgnoreCase("Y") || areHeadersStr.equalsIgnoreCase("yes")
+                    || areHeadersStr.equalsIgnoreCase("true")){
+                areHeaders = true;
+            } else if (areHeadersStr.equalsIgnoreCase("n") || areHeadersStr.equalsIgnoreCase("no")
+                    || areHeadersStr.equalsIgnoreCase("false")) {
+                areHeaders = false;
+            }else {
+                return ResponseEntity.badRequest().body("areHeaders must be Y/YES/TRUE/N/NO/FALSE");
+            }
+            if(dateFormat.isEmpty()){
+                dateFormat = "yyyy-MM-d";
+            }
+
             List<AssignmentDTO> assignmentDTOS = reader.read(multipartFile.getInputStream(),
-                    dto.areHeaders(),
-                    dto.getDateFormat());
+                    areHeaders,
+                    dateFormat);
             List<Assignment> result = assignmentDTOS.stream().map(AssignmentDTOMapper::setAssignment).toList();
             assignmentService.create(result);
             return ResponseEntity.ok("Successful upload");
@@ -49,7 +67,7 @@ public class AssignmentReSTController {
 
     @GetMapping("/longestpairs")
     ResponseEntity<List<EmployeePairDTO>> getLongestRunningPairColleagues(){
-        return ResponseEntity.ok().body(assignmentService.findLongestRunningPair());
+        return ResponseEntity.ok().body(assignmentService.findLongestRunningPairs());
     }
     @GetMapping("/longestrunningteam")
     ResponseEntity<String> getLongestRunningPairColleaguesWithDates(){
