@@ -1,6 +1,7 @@
 package com.employee.assignmentManagement.models;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,8 +13,8 @@ import java.util.Objects;
 @Entity
 @Table(name = "projects")
 @PrimaryKeyJoinColumn(name = "id")
-@Data
-@AllArgsConstructor
+//@Data
+//@AllArgsConstructor
 @NoArgsConstructor
 public class Project implements Serializable {
     @Id
@@ -23,7 +24,7 @@ public class Project implements Serializable {
     private long id;
 
     @Column(name = "project_number", unique = true)
-    @NotNull
+    @NotBlank
     private String projectNumber;
 
     public Project(long id, String projectNumber) {

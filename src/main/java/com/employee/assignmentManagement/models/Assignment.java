@@ -4,14 +4,18 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.Range;
 
 import java.io.Serializable;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.Objects;
 
+@Getter
 @Entity
 @Table(name = "assignments")
 @Data
@@ -24,16 +28,14 @@ public class Assignment implements Serializable {
     @Column(name = "id")
     private long id;
 
-    @Column(name = "employee_id")
     @NotNull
     @ManyToOne(optional = false, fetch = FetchType.EAGER)
-    @JoinColumn(name = "id")
+    @JoinColumn(name = "employee_id")
     private Employee employee;
 
-    @Column(name = "project_id")
     @NotNull
     @ManyToOne(optional = false, fetch = FetchType.EAGER)
-    @JoinColumn(name = "id")
+    @JoinColumn(name = "project_id")
     private Project project;
 
     @Column(name = "start_date")
@@ -52,52 +54,60 @@ public class Assignment implements Serializable {
         this.endDate = endDate;
     }
 
-    public Assignment(long id, Employee employee, Project project, LocalDate startDate, LocalDate endDate) {
-        this.id = id;
-        this.employee = employee;
-        this.project = project;
-        this.startDate = startDate;
-        this.endDate = endDate;
-    }
-
-    public long getId() {
-        return id;
-    }
-
     public void setId(long id) {
         this.id = id;
-    }
-
-    public Employee getEmployee() {
-        return employee;
     }
 
     public void setEmployee(Employee employee) {
         this.employee = employee;
     }
 
-    public Project getProject() {
-        return project;
-    }
-
     public void setProject(Project project) {
         this.project = project;
-    }
-
-    public LocalDate getStartDate() {
-        return startDate;
     }
 
     public void setStartDate(LocalDate startDate) {
         this.startDate = startDate;
     }
 
-    public LocalDate getEndDate() {
-        return endDate;
-    }
-
     public void setEndDate(LocalDate endDate) {
         this.endDate = endDate;
+    }
+
+    public boolean isOverLapping(Assignment a){
+        LocalDate OfThisEndDate = this.endDate == null ? LocalDate.now() : this.endDate;
+        LocalDate OfAEndDate = a.endDate == null ? LocalDate.now() : a.endDate;
+        return !(OfThisEndDate.isBefore(a.startDate) || this.startDate.isAfter(OfAEndDate));
+    }
+    public long getNumberOverlappingDays(Assignment a){
+        if (!isOverLapping(a)){
+            return 0;
+        }
+        LocalDate OfThisEndDate = this.endDate == null ? LocalDate.now() : this.endDate;
+        LocalDate OfAEndDate = a.endDate == null ? LocalDate.now() : a.endDate;
+
+        if(OfThisEndDate.equals(a.startDate) || this.startDate.equals(OfAEndDate)){
+            return 1;
+        }
+        LocalDate overlapStart = this.startDate.isAfter(a.startDate) ? this.startDate : a.startDate;
+        LocalDate overlapEnd = OfThisEndDate.isBefore(OfAEndDate) ? OfThisEndDate : OfAEndDate;
+//        adding a day since the end date is excluded by the method
+        return ChronoUnit.DAYS.between(overlapStart,overlapEnd) +1;
+    }
+    public boolean merges (Assignment a){
+        if(this.employee.equals(a.employee)
+                && this.project.equals(a.project)
+                && isOverLapping(a)){
+
+            this.startDate = this.startDate.isBefore(a.startDate) ? this.startDate : a.startDate;
+            if (this.endDate == null || a.endDate == null){
+                this.endDate = null;
+            }else {
+                this.endDate = this.endDate.isAfter(a.endDate) ? this.endDate : a.endDate;
+            }
+            return true;
+        }
+        return false;
     }
 
     @Override

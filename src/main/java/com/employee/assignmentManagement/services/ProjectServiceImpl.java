@@ -12,9 +12,9 @@ import java.util.List;
 
 @Service
 public class ProjectServiceImpl implements ProjectService{
-    @Autowired
     private ProjectRepository repository;
 
+    @Autowired
     public ProjectServiceImpl(ProjectRepository repository) {
         this.repository = repository;
     }

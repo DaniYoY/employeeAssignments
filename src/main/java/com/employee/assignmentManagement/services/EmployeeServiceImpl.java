@@ -11,9 +11,10 @@ import java.util.List;
 
 @Service
 public class EmployeeServiceImpl implements EmployeeService{
-    @Autowired
+
     private EmployeeRepository repository;
 
+    @Autowired
     public EmployeeServiceImpl(EmployeeRepository repository) {
         this.repository = repository;
     }
