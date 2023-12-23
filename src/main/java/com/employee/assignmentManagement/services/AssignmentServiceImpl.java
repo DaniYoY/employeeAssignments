@@ -111,8 +111,8 @@ public class AssignmentServiceImpl implements AssignmentService {
     }
 
     private Assignment create(Assignment assignment, List<Assignment> assignmentList) {
-        assignment.setEmployee(employeeService.getByPersonalID(assignment.getEmployee().getPersonalNumber()));
-        assignment.setProject(projectService.getByProjectID(assignment.getProject().getProjectNumber()));
+        assignment.setEmployee(employeeService.getOrCreate(assignment.getEmployee()));
+        assignment.setProject(projectService.getOrCreate(assignment.getProject()));
         boolean isMerged = false;
         long id = 0;
         for (Assignment a : assignmentList) {
@@ -129,4 +129,15 @@ public class AssignmentServiceImpl implements AssignmentService {
         return repository.save(assignment);
     }
 
+    @Override
+    public List<Assignment> getByEmployee(Employee employee){
+        Employee e = employeeService.getByPersonalID(employee.getPersonalNumber());
+        return repository.findByEmployee(e);
+    }
+
+    @Override
+    public List<Assignment> getByProject(Project project){
+        Project p = projectService.getByProjectID(project.getProjectNumber());
+        return repository.findByProject(p);
+    }
 }

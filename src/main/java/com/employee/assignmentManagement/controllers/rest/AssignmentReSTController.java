@@ -14,8 +14,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,6 +25,8 @@ import java.util.List;
 @RequestMapping("/assignments")
 public class AssignmentReSTController {
 
+    public static final String SERVER_ECXEPTION_MSG = "There is an issue connecting to the server: %s";
+    public static final String NO_SUCH_ASSIGNMENT_MSG = "There is no such assignment";
     @Autowired
     private final AssignmentService assignmentService;
 
@@ -61,36 +65,58 @@ public class AssignmentReSTController {
             return ResponseEntity.ok("Successful upload");
         } catch (FileException ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
+        }catch (EntityNotFoundException ex){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ex.getMessage());
         }
     }
 
-    @GetMapping("/longestpairs")
+    @GetMapping("/pairs")
     ResponseEntity<List<EmployeePairDTO>> getLongestRunningPairColleagues() {
-        return ResponseEntity.ok().body(assignmentService.findLongestRunningPairs());
+        try {
+            return ResponseEntity.ok().body(assignmentService.findLongestRunningPairs());
+        }catch (RuntimeException ex){
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
+                    String.format(SERVER_ECXEPTION_MSG, ex.getMessage()));
+        }
     }
 
     @GetMapping("/longestrunningteam")
     ResponseEntity<String> getLongestRunningPairColleaguesWithDates() {
-        return ResponseEntity.ok().body(assignmentService.findLongestRunningTeam());
+        try {
+            return ResponseEntity.ok().body(assignmentService.findLongestRunningTeam());
+        }catch (RuntimeException ex){
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
+                    String.format(SERVER_ECXEPTION_MSG, ex.getMessage()));
+        }
     }
 
     @GetMapping
     ResponseEntity<List<AssignmentDTO>> getAll() {
-        List<AssignmentDTO> result = new ArrayList<>();
-        for (Assignment a : assignmentService.getAll()) {
-            result.add(AssignmentDTOMapper.setToDTO(a));
+        try {
+            List<AssignmentDTO> result = new ArrayList<>();
+            for (Assignment a : assignmentService.getAll()) {
+                result.add(AssignmentDTOMapper.setToDTO(a));
+            }
+            return ResponseEntity.ok(result);
+        }catch (RuntimeException ex){
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
+                    String.format(SERVER_ECXEPTION_MSG, ex.getMessage()));
         }
-        return ResponseEntity.ok(result);
     }
 
     @GetMapping(value = {"/{employeeId}/{projectID}/all", "/{employeeId}/{projectID}"})
     ResponseEntity<List<AssignmentDTO>> getAllByEmployeeAndProject(@PathVariable("employeeId") String employeeId,
                                                                    @PathVariable("projectID") String projectId) {
-        List<AssignmentDTO> result = new ArrayList<>();
-        for (Assignment a : assignmentService.getByEmployeeAndProject(employeeId, projectId)) {
-            result.add(AssignmentDTOMapper.setToDTO(a));
+        try {
+            List<AssignmentDTO> result = new ArrayList<>();
+            for (Assignment a : assignmentService.getByEmployeeAndProject(employeeId, projectId)) {
+                result.add(AssignmentDTOMapper.setToDTO(a));
+            }
+            return ResponseEntity.ok(result);
+        }catch (RuntimeException ex){
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
+                    String.format(SERVER_ECXEPTION_MSG, ex.getMessage()));
         }
-        return ResponseEntity.ok(result);
     }
 
     @GetMapping("/{employeeId}/{projectID}/{id}")
@@ -101,11 +127,15 @@ public class AssignmentReSTController {
             AssignmentDTO assignmentDTO = AssignmentDTOMapper.setToDTO(assignmentService.getById(id));
             if (assignmentDTO.getEmployeeID().equals(employeeId) && assignmentDTO.getProjectID().equals(projectId)) {
                 return ResponseEntity.ok(assignmentDTO);
+            }else{
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, NO_SUCH_ASSIGNMENT_MSG);
             }
         } catch (EntityNotFoundException ex) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new AssignmentDTO());
+        }catch (RuntimeException ex){
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
+                    String.format(SERVER_ECXEPTION_MSG, ex.getMessage()));
         }
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(new AssignmentDTO());
     }
 
     @GetMapping("/{id}")
@@ -114,14 +144,20 @@ public class AssignmentReSTController {
             return ResponseEntity.ok(AssignmentDTOMapper.setToDTO(assignmentService.getById(id)));
         } catch (EntityNotFoundException ex) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new AssignmentDTO());
+        }catch (RuntimeException ex){
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
+                    String.format(SERVER_ECXEPTION_MSG, ex.getMessage()));
         }
     }
 
     @PostMapping
     ResponseEntity<AssignmentDTO> createOne(@Valid @RequestBody AssignmentDTO dto) {
         Assignment assignment = AssignmentDTOMapper.setAssignment(dto);
-        ;
-        return ResponseEntity.ok(AssignmentDTOMapper.setToDTO(assignmentService.create(assignment)));
+        try {
+            return ResponseEntity.ok(AssignmentDTOMapper.setToDTO(assignmentService.create(assignment)));
+        }catch (EntityNotFoundException ex){
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
+        }
     }
 
     @DeleteMapping("/{id}")

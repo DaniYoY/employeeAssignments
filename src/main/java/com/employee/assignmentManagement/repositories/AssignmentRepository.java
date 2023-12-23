@@ -48,5 +48,7 @@ public interface AssignmentRepository extends JpaRepository<Assignment, Long> {
     }
 
     List<Assignment> findByEmployeeAndProject(Employee employee, Project project);
+    List<Assignment> findByProject(Project project);
+    List<Assignment> findByEmployee(Employee employee);
 }
 

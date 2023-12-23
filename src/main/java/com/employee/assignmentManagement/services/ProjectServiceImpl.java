@@ -54,4 +54,14 @@ public class ProjectServiceImpl implements ProjectService {
             repository.save(project);
         }
     }
+
+    @Override
+    public Project getOrCreate(Project project){
+        try{
+            create(project);
+        }catch (DuplicateEntityException ex){
+            System.out.println("Already is system");
+        }
+        return getByProjectID(project.getProjectNumber());
+    }
 }

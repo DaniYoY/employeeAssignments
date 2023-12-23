@@ -1,7 +1,9 @@
 package com.employee.assignmentManagement.services;
 
 import com.employee.assignmentManagement.models.Assignment;
+import com.employee.assignmentManagement.models.Employee;
 import com.employee.assignmentManagement.models.EmployeePairDTO;
+import com.employee.assignmentManagement.models.Project;
 
 import java.util.List;
 
@@ -24,4 +26,7 @@ public interface AssignmentService {
 
     String findLongestRunningTeam();
 
+    List<Assignment> getByEmployee(Employee employee);
+
+    List<Assignment> getByProject(Project project);
 }

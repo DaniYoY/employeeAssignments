@@ -4,6 +4,7 @@ import com.employee.assignmentManagement.models.AssignmentDTO;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 
 public class CSVAssignmentParser {
     public static final int numberOfAssignmentFields = 4;
@@ -16,6 +17,7 @@ public class CSVAssignmentParser {
     public static final int THIRD_ELEMENT = 2;
     public static final int FORTH_ELEMENT = 3;
     public static final String NULL = "null";
+    public static final String START_AFTER_END_MSG = "Start date is after end date. Time travelers are not permitted";
 
     public static AssignmentDTO parse(String line, String dateFormat) {
         String[] values = line.split(COMMA);
@@ -26,10 +28,19 @@ public class CSVAssignmentParser {
 
         String employeeID = values[FIRST_ELEMENT].strip();
         String projectID = values[SECOND_ELEMENT].strip();
-        LocalDate startDate = LocalDate.parse(values[THIRD_ELEMENT].strip(), DateTimeFormatter.ofPattern(dateFormat));
+        LocalDate startDate = null;
+        if (!values[THIRD_ELEMENT].strip().equalsIgnoreCase(NULL)) {
+            startDate = LocalDate.parse(values[THIRD_ELEMENT].strip(), DateTimeFormatter.ofPattern(dateFormat));
+        }
         LocalDate endDate = null;
         if (!values[FORTH_ELEMENT].strip().equalsIgnoreCase(NULL)) {
             endDate = LocalDate.parse(values[FORTH_ELEMENT].strip(), DateTimeFormatter.ofPattern(dateFormat));
+        }
+
+
+        if (endDate != null && (startDate == null || startDate.isAfter(endDate))){
+            throw new DateTimeParseException(START_AFTER_END_MSG,
+                    String.format("start: %s, end: %s",startDate.toString(), endDate.toString()) , 0);
         }
         return new AssignmentDTO(employeeID, projectID, startDate, endDate);
     }

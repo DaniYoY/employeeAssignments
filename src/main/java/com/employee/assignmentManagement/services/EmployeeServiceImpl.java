@@ -55,4 +55,14 @@ public class EmployeeServiceImpl implements EmployeeService {
             repository.save(employee);
         }
     }
+
+    @Override
+    public Employee getOrCreate(Employee employee){
+        try{
+            create(employee);
+        }catch (DuplicateEntityException ex){
+            System.out.println("Already is system");
+        }
+        return getByPersonalID(employee.getPersonalNumber());
+    }
 }
