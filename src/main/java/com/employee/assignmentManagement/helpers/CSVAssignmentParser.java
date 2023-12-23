@@ -9,7 +9,8 @@ import java.time.format.DateTimeFormatter;
 public class CSVAssignmentParser {
     public static final int numberOfAssignmentFields = 4;
 
-    public static final String INVALID_NUMBER_OF_ASSIGNMENT_FIELDS = "You have provided %d arguments to create an Assignment, but only %d are required";
+    public static final String INVALID_NUMBER_OF_ASSIGNMENT_FIELDS = "You have provided %d arguments to create " +
+            "an Assignment, but only %d are required";
     public static final String COMMA = ",";
     public static final int FIRST_ELEMENT = 0;
     public static final int SECOND_ELEMENT = 1;
@@ -21,7 +22,7 @@ public class CSVAssignmentParser {
         String[] values = line.split(COMMA);
         if (values.length != numberOfAssignmentFields) {
             throw new IndexOutOfBoundsException(String.format(INVALID_NUMBER_OF_ASSIGNMENT_FIELDS,
-                    values.length, Assignment.class.getFields().length));
+                    values.length, numberOfAssignmentFields));
         }
 
         String employeeID = values[FIRST_ELEMENT].strip();

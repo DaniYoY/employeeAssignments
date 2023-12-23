@@ -34,7 +34,6 @@ public class AssignmentReSTController {
         this.reader = reader;
     }
 
-//    TODO consumes = {"multipart/form-data"}
     @PostMapping(value = "/upload")
     ResponseEntity<String> uploadAssignmentsFromFile(@RequestParam("file") @Valid @NotNull MultipartFile multipartFile,
                                              @RequestParam("areHeaders") @Valid @NotBlank String areHeadersStr,
