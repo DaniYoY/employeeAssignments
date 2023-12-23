@@ -18,7 +18,7 @@ public class TeamDTO {
         if (this == o) return true;
         if (!(o instanceof TeamDTO teamDTO)) return false;
         return (Objects.equals(getEmployee1(), teamDTO.getEmployee1()) && Objects.equals(getEmployee2(), teamDTO.getEmployee2()))
-        || (Objects.equals(getEmployee1(), teamDTO.getEmployee2()) && Objects.equals(getEmployee2(), teamDTO.getEmployee1()));
+                || (Objects.equals(getEmployee1(), teamDTO.getEmployee2()) && Objects.equals(getEmployee2(), teamDTO.getEmployee1()));
     }
 
     @Override

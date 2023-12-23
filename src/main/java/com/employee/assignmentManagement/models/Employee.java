@@ -3,18 +3,19 @@ package com.employee.assignmentManagement.models;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.validator.constraints.UniqueElements;
 
 import java.io.Serializable;
 import java.util.Objects;
 
+@Getter
 @Entity
 @Table(name = "employees")
 @PrimaryKeyJoinColumn(name = "id")
 @NoArgsConstructor
+@Data
 public class Employee implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,16 +32,8 @@ public class Employee implements Serializable {
         this.personalNumber = personalNumber;
     }
 
-    public long getId() {
-        return id;
-    }
-
     public void setId(long id) {
         this.id = id;
-    }
-
-    public String getPersonalNumber() {
-        return personalNumber;
     }
 
     public void setPersonalNumber(String personalNumber) {

@@ -36,20 +36,20 @@ public class AssignmentReSTController {
 
     @PostMapping(value = "/upload")
     ResponseEntity<String> uploadAssignmentsFromFile(@RequestParam("file") @Valid @NotNull MultipartFile multipartFile,
-                                             @RequestParam("areHeaders") @Valid @NotBlank String areHeadersStr,
-                                             @RequestParam("dateFormat") @NotNull String dateFormat) throws IOException {
+                                                     @RequestParam("areHeaders") @Valid @NotBlank String areHeadersStr,
+                                                     @RequestParam("dateFormat") @NotNull String dateFormat) throws IOException {
         try {
             boolean areHeaders;
             if (areHeadersStr.equalsIgnoreCase("Y") || areHeadersStr.equalsIgnoreCase("yes")
-                    || areHeadersStr.equalsIgnoreCase("true")){
+                    || areHeadersStr.equalsIgnoreCase("true")) {
                 areHeaders = true;
             } else if (areHeadersStr.equalsIgnoreCase("n") || areHeadersStr.equalsIgnoreCase("no")
                     || areHeadersStr.equalsIgnoreCase("false")) {
                 areHeaders = false;
-            }else {
+            } else {
                 return ResponseEntity.badRequest().body("areHeaders must be Y/YES/TRUE/N/NO/FALSE");
             }
-            if(dateFormat.isEmpty()){
+            if (dateFormat.isEmpty()) {
                 dateFormat = "yyyy-MM-d";
             }
 
@@ -59,33 +59,35 @@ public class AssignmentReSTController {
             List<Assignment> result = assignmentDTOS.stream().map(AssignmentDTOMapper::setAssignment).toList();
             assignmentService.create(result);
             return ResponseEntity.ok("Successful upload");
-        }catch (FileException ex){
+        } catch (FileException ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
     }
 
     @GetMapping("/longestpairs")
-    ResponseEntity<List<EmployeePairDTO>> getLongestRunningPairColleagues(){
+    ResponseEntity<List<EmployeePairDTO>> getLongestRunningPairColleagues() {
         return ResponseEntity.ok().body(assignmentService.findLongestRunningPairs());
     }
+
     @GetMapping("/longestrunningteam")
-    ResponseEntity<String> getLongestRunningPairColleaguesWithDates(){
+    ResponseEntity<String> getLongestRunningPairColleaguesWithDates() {
         return ResponseEntity.ok().body(assignmentService.findLongestRunningTeam());
     }
+
     @GetMapping
-    ResponseEntity<List<AssignmentDTO>> getAll(){
+    ResponseEntity<List<AssignmentDTO>> getAll() {
         List<AssignmentDTO> result = new ArrayList<>();
-        for (Assignment a : assignmentService.getAll()){
+        for (Assignment a : assignmentService.getAll()) {
             result.add(AssignmentDTOMapper.setToDTO(a));
         }
         return ResponseEntity.ok(result);
     }
 
-    @GetMapping(value = {"/{employeeId}/{projectID}/all", "/{employeeId}/{projectID}"} )
+    @GetMapping(value = {"/{employeeId}/{projectID}/all", "/{employeeId}/{projectID}"})
     ResponseEntity<List<AssignmentDTO>> getAllByEmployeeAndProject(@PathVariable("employeeId") String employeeId,
-                                               @PathVariable("projectID") String projectId){
+                                                                   @PathVariable("projectID") String projectId) {
         List<AssignmentDTO> result = new ArrayList<>();
-        for (Assignment a : assignmentService.getByEmployeeAndProject(employeeId, projectId)){
+        for (Assignment a : assignmentService.getByEmployeeAndProject(employeeId, projectId)) {
             result.add(AssignmentDTOMapper.setToDTO(a));
         }
         return ResponseEntity.ok(result);
@@ -94,46 +96,50 @@ public class AssignmentReSTController {
     @GetMapping("/{employeeId}/{projectID}/{id}")
     ResponseEntity<AssignmentDTO> getByEmployeeAndProject(@PathVariable("employeeId") String employeeId,
                                                           @PathVariable("projectID") String projectId,
-                                                          @PathVariable("id") Long id){
+                                                          @PathVariable("id") Long id) {
         try {
             AssignmentDTO assignmentDTO = AssignmentDTOMapper.setToDTO(assignmentService.getById(id));
             if (assignmentDTO.getEmployeeID().equals(employeeId) && assignmentDTO.getProjectID().equals(projectId)) {
                 return ResponseEntity.ok(assignmentDTO);
             }
-        }catch (EntityNotFoundException ex) {
+        } catch (EntityNotFoundException ex) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new AssignmentDTO());
         }
         return ResponseEntity.status(HttpStatus.CONFLICT).body(new AssignmentDTO());
     }
+
     @GetMapping("/{id}")
-    ResponseEntity<AssignmentDTO> getById(@PathVariable("id") Long id){
+    ResponseEntity<AssignmentDTO> getById(@PathVariable("id") Long id) {
         try {
             return ResponseEntity.ok(AssignmentDTOMapper.setToDTO(assignmentService.getById(id)));
-        }catch (EntityNotFoundException ex) {
+        } catch (EntityNotFoundException ex) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new AssignmentDTO());
         }
     }
+
     @PostMapping
-    ResponseEntity<AssignmentDTO> createOne(@Valid @RequestBody AssignmentDTO dto){
-        Assignment assignment = AssignmentDTOMapper.setAssignment(dto);;
+    ResponseEntity<AssignmentDTO> createOne(@Valid @RequestBody AssignmentDTO dto) {
+        Assignment assignment = AssignmentDTOMapper.setAssignment(dto);
+        ;
         return ResponseEntity.ok(AssignmentDTOMapper.setToDTO(assignmentService.create(assignment)));
     }
 
     @DeleteMapping("/{id}")
-    ResponseEntity<String> deleteOne(@PathVariable long id){
+    ResponseEntity<String> deleteOne(@PathVariable long id) {
         try {
             assignmentService.delete(id);
             return ResponseEntity.ok("Success");
-        }catch (EntityNotFoundException ex){
+        } catch (EntityNotFoundException ex) {
             return ResponseEntity.badRequest().body("Fail");
         }
     }
+
     @PutMapping("/{id}")
-    ResponseEntity<String> createOne(@PathVariable long id, @Valid @RequestBody AssignmentDTO dto){
+    ResponseEntity<String> createOne(@PathVariable long id, @Valid @RequestBody AssignmentDTO dto) {
         try {
             assignmentService.update(id, AssignmentDTOMapper.setAssignment(dto));
             return ResponseEntity.ok("Success");
-        }catch (EntityNotFoundException ex){
+        } catch (EntityNotFoundException ex) {
             return ResponseEntity.badRequest().body("Fail");
         }
     }

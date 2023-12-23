@@ -11,13 +11,13 @@ import java.util.List;
 
 @Component
 public class CSVAssignmentDTOWriter implements AssignmentDTOWriter {
-    public void write(List<AssignmentDTO> items, String filename){
-        try(FileWriter writer = new FileWriter(filename)) {
-            for (Serializable item : items){
+    public void write(List<AssignmentDTO> items, String filename) {
+        try (FileWriter writer = new FileWriter(filename)) {
+            for (Serializable item : items) {
                 writer.write(items.toString());
                 writer.write(System.lineSeparator());
             }
-        } catch (IOException ex){
+        } catch (IOException ex) {
             ex.printStackTrace();
             throw new FileException(ex.getMessage());
         }

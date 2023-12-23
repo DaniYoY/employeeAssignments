@@ -1,6 +1,5 @@
 package com.employee.assignmentManagement.helpers;
 
-import com.employee.assignmentManagement.models.Assignment;
 import com.employee.assignmentManagement.models.AssignmentDTO;
 
 import java.time.LocalDate;

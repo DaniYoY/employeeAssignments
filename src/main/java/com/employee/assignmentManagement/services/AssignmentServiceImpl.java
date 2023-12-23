@@ -72,7 +72,7 @@ public class AssignmentServiceImpl implements AssignmentService {
 
 
     @Override
-    public List<EmployeePairDTO> findLongestRunningPairs(){
+    public List<EmployeePairDTO> findLongestRunningPairs() {
         return repository.findLongestRunningPairs();
     }
 
@@ -80,35 +80,36 @@ public class AssignmentServiceImpl implements AssignmentService {
     public String findLongestRunningTeam() {
         List<EmployeePairDTO> pairs = repository.findLongestRunningPairs();
         Map<TeamDTO, TeamAssignmentDTO> teams = new HashMap<>();
-        for (EmployeePairDTO pair: pairs) {
+        for (EmployeePairDTO pair : pairs) {
             TeamDTO t = new TeamDTO(employeeService.getByID(pair.getFirstEmpId()).getPersonalNumber(),
-                            employeeService.getByID(pair.getSecondEmplId()).getPersonalNumber());
-            teams.putIfAbsent(t,new TeamAssignmentDTO(new HashMap<>(), 0L));
+                    employeeService.getByID(pair.getSecondEmplId()).getPersonalNumber());
+            teams.putIfAbsent(t, new TeamAssignmentDTO(new HashMap<>(), 0L));
             String project = projectService.getByID(pair.getProjectId()).getProjectNumber();
 
             if (teams.get(t).getProject().containsKey(project)) {
                 long currentDuration = teams.get(t).getProject().get(project);
                 teams.get(t).getProject().put(project, currentDuration + pair.getDuration());
-            }else {
+            } else {
                 teams.get(t).getProject().putIfAbsent(project, pair.getDuration());
             }
             teams.get(t).setTotalDuration(teams.get(t).getTotalDuration() + pair.getDuration());
         }
 
-        Map.Entry<TeamDTO,TeamAssignmentDTO> longestRunning = Collections.max(teams.entrySet(),
+        Map.Entry<TeamDTO, TeamAssignmentDTO> longestRunning = Collections.max(teams.entrySet(),
                 Comparator.comparing((Map.Entry<TeamDTO, TeamAssignmentDTO> e) -> e.getValue().getTotalDuration()));
 
         StringBuilder sb = new StringBuilder();
         sb.append(longestRunning.getKey().toString()).append(',').append(longestRunning.getValue().getTotalDuration())
                 .append(System.lineSeparator());
-        for (Map.Entry<String,Long> projectDuration: longestRunning.getValue().getProject().entrySet()) {
-                sb.append(projectDuration.getKey())
-                        .append(',')
-                        .append(projectDuration.getValue())
-                        .append(System.lineSeparator());
+        for (Map.Entry<String, Long> projectDuration : longestRunning.getValue().getProject().entrySet()) {
+            sb.append(projectDuration.getKey())
+                    .append(',')
+                    .append(projectDuration.getValue())
+                    .append(System.lineSeparator());
         }
         return sb.toString();
     }
+
     private Assignment create(Assignment assignment, List<Assignment> assignmentList) {
         assignment.setEmployee(employeeService.getByPersonalID(assignment.getEmployee().getPersonalNumber()));
         assignment.setProject(projectService.getByProjectID(assignment.getProject().getProjectNumber()));

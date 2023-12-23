@@ -6,7 +6,7 @@ import com.employee.assignmentManagement.models.Employee;
 import com.employee.assignmentManagement.models.Project;
 
 public class AssignmentDTOMapper {
-    public  static Assignment setAssignment(AssignmentDTO dto){
+    public static Assignment setAssignment(AssignmentDTO dto) {
         Assignment assignment = new Assignment();
         Employee employee = new Employee();
         Project project = new Project();
@@ -19,7 +19,8 @@ public class AssignmentDTOMapper {
         assignment.setEndDate(dto.getEndDate());
         return assignment;
     }
-    public  static AssignmentDTO setToDTO (Assignment a){
+
+    public static AssignmentDTO setToDTO(Assignment a) {
         AssignmentDTO dto = new AssignmentDTO();
         dto.setId(a.getId());
         dto.setEmployeeID(a.getEmployee().getPersonalNumber());

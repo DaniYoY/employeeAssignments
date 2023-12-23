@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class EmployeeServiceImpl implements EmployeeService{
+public class EmployeeServiceImpl implements EmployeeService {
 
     private final EmployeeRepository repository;
 
@@ -48,10 +48,10 @@ public class EmployeeServiceImpl implements EmployeeService{
 
     @Override
     public void create(Employee employee) {
-        try{
+        try {
             Employee emp = getByPersonalID(employee.getPersonalNumber());
             throw new DuplicateEntityException(employee.getClass().getSimpleName());
-        }catch (EntityNotFoundException ex) {
+        } catch (EntityNotFoundException ex) {
             repository.save(employee);
         }
     }

@@ -6,13 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.apache.commons.lang3.Range;
-
 import java.io.Serializable;
-import java.time.Duration;
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
-import java.util.Date;
 import java.util.Objects;
 
 @Getter
@@ -74,35 +69,21 @@ public class Assignment implements Serializable {
         this.endDate = endDate;
     }
 
-    public boolean isOverLapping(Assignment a){
+    public boolean isOverLapping(Assignment a) {
         LocalDate OfThisEndDate = this.endDate == null ? LocalDate.now() : this.endDate;
         LocalDate OfAEndDate = a.endDate == null ? LocalDate.now() : a.endDate;
         return !(OfThisEndDate.isBefore(a.startDate) || this.startDate.isAfter(OfAEndDate));
     }
-    public long getNumberOverlappingDays(Assignment a){
-        if (!isOverLapping(a)){
-            return 0;
-        }
-        LocalDate OfThisEndDate = this.endDate == null ? LocalDate.now() : this.endDate;
-        LocalDate OfAEndDate = a.endDate == null ? LocalDate.now() : a.endDate;
 
-        if(OfThisEndDate.equals(a.startDate) || this.startDate.equals(OfAEndDate)){
-            return 1;
-        }
-        LocalDate overlapStart = this.startDate.isAfter(a.startDate) ? this.startDate : a.startDate;
-        LocalDate overlapEnd = OfThisEndDate.isBefore(OfAEndDate) ? OfThisEndDate : OfAEndDate;
-//        adding a day since the end date is excluded by the method
-        return ChronoUnit.DAYS.between(overlapStart,overlapEnd) +1;
-    }
-    public boolean merges (Assignment a){
-        if(this.employee.equals(a.employee)
+    public boolean merges(Assignment a) {
+        if (this.employee.equals(a.employee)
                 && this.project.equals(a.project)
-                && isOverLapping(a)){
+                && isOverLapping(a)) {
 
             this.startDate = this.startDate.isBefore(a.startDate) ? this.startDate : a.startDate;
-            if (this.endDate == null || a.endDate == null){
+            if (this.endDate == null || a.endDate == null) {
                 this.endDate = null;
-            }else {
+            } else {
                 this.endDate = this.endDate.isAfter(a.endDate) ? this.endDate : a.endDate;
             }
             return true;

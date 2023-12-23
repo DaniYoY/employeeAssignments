@@ -1,7 +1,6 @@
 package com.employee.assignmentManagement.services;
 
 import com.employee.assignmentManagement.exceptions.DuplicateEntityException;
-import com.employee.assignmentManagement.models.Employee;
 import com.employee.assignmentManagement.models.Project;
 import com.employee.assignmentManagement.repositories.ProjectRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -11,7 +10,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class ProjectServiceImpl implements ProjectService{
+public class ProjectServiceImpl implements ProjectService {
     private final ProjectRepository repository;
 
     @Autowired
@@ -43,15 +42,15 @@ public class ProjectServiceImpl implements ProjectService{
 
     @Override
     public void delete(Long id) {
-    repository.deleteById(id);
+        repository.deleteById(id);
     }
 
     @Override
     public void create(Project project) {
-        try{
+        try {
             Project p = getByProjectID(project.getProjectNumber());
             throw new DuplicateEntityException(project.getClass().getSimpleName());
-        }catch (EntityNotFoundException ex) {
+        } catch (EntityNotFoundException ex) {
             repository.save(project);
         }
     }
